@@ -1,0 +1,193 @@
+[
+  {
+    "id": 1,
+    "priority": 10,
+    "action": { "type": "block" },
+    "condition": {
+      "resourceTypes": ["websocket"],
+      "initiatorDomains": ["instagram.com"]
+    }
+  },
+  {
+    "id": 2,
+    "priority": 10,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||edge-chat",
+      "resourceTypes": ["websocket"],
+      "initiatorDomains": ["instagram.com"]
+    }
+  },
+  {
+    "id": 3,
+    "priority": 10,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||gateway",
+      "resourceTypes": ["websocket"],
+      "initiatorDomains": ["instagram.com"]
+    }
+  },
+  {
+    "id": 4,
+    "priority": 5,
+    "action": { "type": "block" },
+    "condition": {
+      "regexFilter": "^wss?://.*(edge-chat|gateway)\\.(instagram|facebook|messenger)\\.com",
+      "resourceTypes": ["websocket"],
+      "initiatorDomains": ["instagram.com"]
+    }
+  },
+  {
+    "id": 5,
+    "priority": 5,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||instagram.com/api/v1/direct_v2/threads/*/items/*/seen/",
+      "requestMethods": ["post"]
+    }
+  },
+  {
+    "id": 6,
+    "priority": 5,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||instagram.com/api/v1/direct_v2/threads/*/seen/",
+      "requestMethods": ["post"]
+    }
+  },
+  {
+    "id": 7,
+    "priority": 5,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||instagram.com/api/v1/direct_v2/threads/batched_seen*",
+      "requestMethods": ["post"]
+    }
+  },
+  {
+    "id": 8,
+    "priority": 5,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||instagram.com/api/v1/direct_v2/threads/*/activity_status_seen*",
+      "requestMethods": ["post"]
+    }
+  },
+  {
+    "id": 9,
+    "priority": 5,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||instagram.com/api/v1/direct_v2/threads/*/seen_direct_thread*",
+      "requestMethods": ["post"]
+    }
+  },
+  {
+    "id": 10,
+    "priority": 5,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||instagram.com/api/v1/direct_v2/visual_threads/item_seen*",
+      "requestMethods": ["post"]
+    }
+  },
+  {
+    "id": 11,
+    "priority": 5,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||instagram.com/api/v1/direct_v2/threads/item_seen*",
+      "requestMethods": ["post"]
+    }
+  },
+  {
+    "id": 12,
+    "priority": 5,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||instagram.com/api/v1/stories/reel/seen",
+      "requestMethods": ["post"]
+    }
+  },
+  {
+    "id": 13,
+    "priority": 5,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||instagram.com/api/v1/stories/seen",
+      "requestMethods": ["post"]
+    }
+  },
+  {
+    "id": 14,
+    "priority": 5,
+    "action": { "type": "block" },
+    "condition": {
+      "regexFilter": "^https?://([^.]+\\.)?instagram\\.com/api/v1/media/[^/]+/seen",
+      "requestMethods": ["post"]
+    }
+  },
+
+  {
+    "id": 17,
+    "priority": 10,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "useIGDMarkThreadAsRead"
+    }
+  },
+  {
+    "id": 18,
+    "priority": 10,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "IGDMarkThreadAsRead"
+    }
+  },
+  {
+    "id": 19,
+    "priority": 10,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "PolarisStoriesV3SeenMutation"
+    }
+  },
+  {
+    "id": 20,
+    "priority": 10,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||instagram.com",
+      "resourceTypes": ["websocket"]
+    }
+  },
+  {
+    "id": 21,
+    "priority": 10,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||facebook.com",
+      "resourceTypes": ["websocket"],
+      "initiatorDomains": ["instagram.com"]
+    }
+  },
+  {
+    "id": 22,
+    "priority": 10,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||messenger.com",
+      "resourceTypes": ["websocket"],
+      "initiatorDomains": ["instagram.com"]
+    }
+  },
+  {
+    "id": 23,
+    "priority": 10,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "PolarisDirect"
+    }
+  }
+]

@@ -1,0 +1,89 @@
+{
+  "manifest_version": 3,
+  "name": "IG Tools",
+  "version": "1.0.0",
+  "description": "Personal Instagram power tools: Ghost Mode (unseen Stories & DMs), media downloader, and enhancements.",
+  "permissions": [
+    "storage",
+    "declarativeNetRequest",
+    "downloads"
+  ],
+  "host_permissions": [
+    "*://*.instagram.com/*",
+    "*://instagram.com/*",
+    "https://*.cdninstagram.com/*",
+    "https://*.fbcdn.net/*"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.instagram.com/*",
+        "*://instagram.com/*"
+      ],
+      "all_frames": true,
+      "js": ["content/ghost.js"],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "*://*.instagram.com/*",
+        "*://instagram.com/*"
+      ],
+      "all_frames": false,
+      "js": [
+        "content/privacy.js",
+        "content/account.js",
+        "content/download.js",
+        "content/friends-liked.js",
+        "content/reel-slider.js",
+        "content/comments.js",
+        "content/content.js"
+      ],
+      "css": ["styles/styles.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content/ghost.js",
+        "styles/styles.css",
+        "icons/*"
+      ],
+      "matches": [
+        "*://*.instagram.com/*",
+        "*://instagram.com/*"
+      ]
+    }
+  ],
+  "action": {
+    "default_title": "IG Tools",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

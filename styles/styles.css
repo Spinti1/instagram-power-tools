@@ -1,0 +1,1752 @@
+/**
+ * IG Tools - INSSIST-Style Design System
+ * Modern obsidian dark theme, full-height side panel drawer,
+ * integrated sidebar items, and pixel-perfect native Instagram controls.
+ */
+
+/* ==========================================================================
+   1. INSSIST Assistant Side Panel Drawer & Backdrop
+   ========================================================================== */
+
+/* Fullscreen semi-transparent backdrop */
+.ig-tools-drawer-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  z-index: 2147483646 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.ig-tools-drawer-backdrop.open {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Full-height sliding side panel (Right-anchored like INSSIST) */
+.ig-tools-drawer {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 420px !important;
+  max-width: 95vw !important;
+  height: 100vh !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: #0d0d11 !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: -16px 0 50px rgba(0, 0, 0, 0.8) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  color: #f4f4f5 !important;
+  transform: translateX(100%) !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none !important;
+}
+
+.ig-tools-drawer.open {
+  transform: translateX(0) !important;
+}
+
+/* Drawer Header */
+.ig-tools-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: #111116;
+}
+
+.ig-tools-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ig-tools-brand-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
+  flex-shrink: 0;
+}
+
+.ig-tools-brand-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ig-tools-brand-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.ig-tools-pro-tag {
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #f43f5e, #8b5cf6);
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.ig-tools-brand-sub {
+  font-size: 11px;
+  color: #71717a;
+  letter-spacing: 0.1px;
+}
+
+.ig-tools-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ig-tools-header-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  font-weight: 600;
+  color: #71717a;
+  transition: all 0.2s ease;
+}
+
+.ig-tools-header-pill.active {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+.ig-tools-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #71717a;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ig-tools-header-pill.active .ig-tools-pill-dot {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.ig-tools-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: #a1a1aa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ig-tools-close-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* Category Navigation Tabs (Segmented bar) */
+.ig-tools-drawer-nav {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  gap: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: #0d0d11;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ig-tools-drawer-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.ig-tools-nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #a1a1aa;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.ig-tools-nav-tab:hover {
+  color: #f4f4f5;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ig-tools-nav-tab.active {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+/* Scrollable Drawer Body */
+.ig-tools-drawer-body {
+  flex: 1;
+  padding: 16px 18px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.ig-tools-drawer-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ig-tools-drawer-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+/* ==========================================================================
+   2. Obsidian Card Design System (INSSIST Layout)
+   ========================================================================== */
+
+.ig-tools-card {
+  background: #15151a;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hero Master Toggle Card */
+.ig-tools-hero-card {
+  background: #16161c;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ig-tools-hero-card.glow-active {
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.14);
+}
+
+.ig-tools-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ig-tools-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ig-tools-hero-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: #10b981;
+}
+
+.ig-tools-card-title {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ig-tools-card-desc {
+  margin: 0;
+  font-size: 11.5px;
+  color: #a1a1aa;
+  line-height: 1.4;
+}
+
+.ig-tools-card-header-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #a1a1aa;
+}
+
+/* Sub-row items inside card */
+.ig-tools-row-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  transition: background 0.15s ease;
+}
+
+.ig-tools-row-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ig-tools-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ig-tools-item-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #f4f4f5;
+}
+
+.ig-tools-item-desc {
+  font-size: 11px;
+  color: #71717a;
+  line-height: 1.3;
+}
+
+/* ==========================================================================
+   3. iOS / INSSIST Style Toggle Switches
+   ========================================================================== */
+
+.ig-tools-switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.ig-tools-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ig-tools-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #27272e;
+  border-radius: 9999px;
+  transition: background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ig-tools-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ig-tools-switch input:checked + .ig-tools-switch-slider {
+  background-color: #10b981;
+  border-color: transparent;
+}
+
+.ig-tools-switch input:checked + .ig-tools-switch-slider:before {
+  transform: translateX(18px);
+}
+
+.ig-tools-switch input:disabled + .ig-tools-switch-slider {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Mini Switch */
+.ig-tools-switch.mini {
+  width: 36px;
+  height: 20px;
+}
+
+.ig-tools-switch.mini .ig-tools-switch-slider:before {
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+}
+
+.ig-tools-switch.mini input:checked + .ig-tools-switch-slider:before {
+  transform: translateX(16px);
+}
+
+/* ==========================================================================
+   4. Stats & Metrics Grids
+   ========================================================================== */
+
+.ig-tools-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.ig-tools-stats-grid.quad {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ig-tools-stat-box {
+  background: #101014;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ig-tools-stat-box.accent-red .ig-tools-stat-number {
+  color: #f87171;
+}
+
+.ig-tools-stat-box.accent-green .ig-tools-stat-number {
+  color: #34d399;
+}
+
+.ig-tools-stat-number {
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.ig-tools-stat-caption {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #71717a;
+}
+
+.ig-tools-security-note {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: #a1a1aa;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+/* ==========================================================================
+   5. Actions, Buttons & Speed Selectors
+   ========================================================================== */
+
+.ig-tools-action-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ig-tools-btn-grid {
+  display: flex;
+  gap: 8px;
+}
+
+.ig-tools-btn-grid > * {
+  flex: 1;
+}
+
+.ig-tools-primary-action-btn {
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  border: none;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.35);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.ig-tools-primary-action-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.ig-tools-primary-action-btn.full-width {
+  width: 100%;
+}
+
+.ig-tools-secondary-action-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f4f4f5;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: all 0.15s ease;
+}
+
+.ig-tools-secondary-action-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.ig-tools-secondary-action-btn.full-width {
+  width: 100%;
+}
+
+.ig-tools-danger-btn {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ig-tools-danger-btn:hover {
+  background: rgba(239, 68, 68, 0.22);
+}
+
+.ig-tools-danger-btn.full-width {
+  width: 100%;
+}
+
+.ig-tools-btn-inline {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.ig-tools-btn-inline:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Speed Selector Pills */
+.ig-tools-speed-selector {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.ig-tools-speed-pill {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #a1a1aa;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ig-tools-speed-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.ig-tools-speed-pill.active {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.5);
+  color: #c4b5fd;
+}
+
+/* Dark Input Bar */
+.ig-tools-input-bar {
+  display: flex;
+  gap: 6px;
+}
+
+.ig-tools-dark-input {
+  flex: 1;
+  background: #0f0f13;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.ig-tools-dark-input:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Muted Tags Wrap */
+.ig-tools-muted-list-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.ig-tools-muted-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 3px 8px;
+  font-size: 11px;
+}
+
+.ig-tools-remove-mute-btn {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Unfollowers Scroll Box */
+.ig-tools-unfollowers-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.ig-tools-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #d4d4d8;
+}
+
+.ig-tools-pill-link {
+  background: transparent;
+  border: none;
+  color: #60a5fa;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ig-tools-pill-link:hover {
+  text-decoration: underline;
+}
+
+.ig-tools-box-scroll {
+  max-height: 150px;
+  overflow-y: auto;
+  border-radius: 10px;
+  background: #0f0f13;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ig-tools-account-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ig-tools-account-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #27272a;
+}
+
+.ig-tools-account-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.ig-tools-account-username {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.ig-tools-account-username:hover {
+  text-decoration: underline;
+}
+
+.ig-tools-account-fullname {
+  font-size: 10px;
+  color: #71717a;
+}
+
+.ig-tools-progress-text {
+  font-size: 11px;
+  color: #a1a1aa;
+  font-style: italic;
+  min-height: 16px;
+}
+
+.ig-tools-empty-note {
+  font-size: 11px;
+  color: #71717a;
+  padding: 6px;
+}
+
+/* Templates & Shortcuts */
+.ig-tools-templates-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ig-tools-template-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.ig-tools-template-text {
+  font-size: 11.5px;
+  color: #f4f4f5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ig-tools-copy-btn {
+  background: rgba(255, 255, 255, 0.09);
+  border: none;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ig-tools-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.ig-tools-shortcuts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ig-tools-shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11.5px;
+  color: #d4d4d8;
+}
+
+.ig-tools-shortcut-item kbd {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ig-tools-footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.ig-tools-footer-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #a1a1aa;
+}
+
+.ig-tools-footer-sub {
+  font-size: 10px;
+  color: #71717a;
+}
+
+/* ==========================================================================
+   6. Assistant Floating Trigger Button (Top-Right Dock)
+   ========================================================================== */
+
+#ig-tools-assistant-trigger {
+  position: fixed !important;
+  top: 76px !important;
+  right: 20px !important;
+  z-index: 2147483645 !important;
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  outline: none !important;
+}
+
+.ig-tools-trigger-capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: rgba(14, 14, 18, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #f4f4f5;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s ease,
+              border-color 0.2s ease,
+              background 0.2s ease;
+}
+
+#ig-tools-assistant-trigger:hover .ig-tools-trigger-capsule {
+  transform: translateY(1px) scale(1.03);
+  border-color: rgba(255, 255, 255, 0.32);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.75);
+  background: rgba(24, 24, 30, 0.96);
+}
+
+#ig-tools-assistant-trigger:active .ig-tools-trigger-capsule {
+  transform: scale(0.97);
+}
+
+.ig-tools-trigger-icon-box {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.ig-tools-trigger-text {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #ffffff;
+}
+
+.ig-tools-trigger-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #71717a;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ig-tools-trigger-dot.active {
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+/* ==========================================================================
+   7. Injected Sidebar Navigation Item (Native INSSIST Look)
+   ========================================================================== */
+
+.ig-tools-sidebar-item {
+  display: flex !important;
+  align-items: center !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  margin: 4px 0 !important;
+  padding: 0 12px !important;
+  color: #f4f4f5 !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.ig-tools-sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.ig-tools-sidebar-inner {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  width: 100% !important;
+}
+
+.ig-tools-sidebar-icon {
+  width: 24px !important;
+  height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #ec4899 !important;
+}
+
+.ig-tools-sidebar-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #f4f4f5 !important;
+}
+
+/* ==========================================================================
+   8. Native Reels Right-Column Action Button
+   ========================================================================== */
+
+.ig-tools-reel-native-action-wrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-top: 16px !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  outline: none !important;
+  z-index: 10 !important;
+  transition: transform 0.15s ease !important;
+}
+
+.ig-tools-reel-native-action-wrapper:hover {
+  transform: scale(1.08) !important;
+}
+
+.ig-tools-reel-native-action-wrapper:active {
+  transform: scale(0.95) !important;
+}
+
+.ig-tools-reel-native-icon-box {
+  width: 44px !important;
+  height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: rgba(24, 24, 27, 0.72) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45) !important;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.ig-tools-reel-native-action-wrapper:hover .ig-tools-reel-native-icon-box {
+  background: rgba(38, 38, 44, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.65) !important;
+}
+
+.ig-tools-reel-native-svg {
+  stroke: #ffffff !important;
+}
+
+.ig-tools-reel-native-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  margin-top: 4px !important;
+  letter-spacing: 0.1px !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+.ig-tools-reel-native-action-wrapper.ig-tools-btn-success .ig-tools-reel-native-icon-box {
+  border-color: rgba(34, 197, 94, 0.6) !important;
+  background: rgba(34, 197, 94, 0.25) !important;
+}
+
+.ig-tools-reel-native-action-wrapper.ig-tools-btn-error .ig-tools-reel-native-icon-box {
+  border-color: rgba(239, 68, 68, 0.6) !important;
+  background: rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Floating fallback Reel download button removed to avoid covering Messages widget */
+#ig-tools-reel-floating-dl,
+.ig-tools-floating-reel-btn {
+  display: none !important;
+}
+
+/* ==========================================================================
+   9. Automatic "Friends Who Liked" Card (Bottom-Left NEXT TO Reel)
+   ========================================================================== */
+
+#ig-tools-auto-friends-card,
+.ig-tools-auto-friends-card {
+  position: fixed !important;
+  z-index: 2147483640 !important;
+  pointer-events: auto !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  user-select: none !important;
+  transition: opacity 0.25s ease !important;
+  width: 240px !important;
+  max-width: 280px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+.ig-tools-auto-friends-card.ig-tools-afc-dimmed {
+  opacity: 0.7 !important;
+}
+
+.ig-tools-auto-friends-card:hover {
+  opacity: 1 !important;
+}
+
+.ig-tools-afc-container {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background: rgba(14, 14, 18, 0.94) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(168, 85, 247, 0.28) !important;
+  border-radius: 14px !important;
+  padding: 9px 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 14px rgba(168, 85, 247, 0.12) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+.ig-tools-afc-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ig-tools-afc-badge-icon {
+  font-size: 12px;
+}
+
+.ig-tools-afc-header-text {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #a1a1aa;
+  letter-spacing: 0.4px;
+}
+
+.ig-tools-afc-users-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.ig-tools-afc-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2px 7px 2px 3px;
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.ig-tools-afc-user:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.ig-tools-afc-avatar {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.ig-tools-afc-username {
+  font-size: 11px;
+  font-weight: 600;
+  color: #f4f4f5;
+  white-space: nowrap;
+}
+
+.ig-tools-afc-extra {
+  font-size: 10.5px;
+  color: #a1a1aa;
+  font-weight: 600;
+  padding: 0 4px;
+}
+
+.ig-tools-afc-empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 9999px;
+  background: rgba(18, 18, 22, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 11px;
+  color: #a1a1aa;
+  font-weight: 500;
+}
+
+.ig-tools-afc-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 9999px;
+  background: rgba(18, 18, 22, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 11px;
+  color: #a1a1aa;
+}
+
+.ig-tools-afc-spinner {
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #c084fc;
+  border-radius: 50%;
+  animation: ig-spin 0.6s linear infinite;
+}
+
+/* ==========================================================================
+   10. Posts & Stories Media Buttons
+   ========================================================================== */
+
+.ig-tools-glass-icon-btn {
+  background: rgba(18, 18, 22, 0.82) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #f4f4f5 !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+  transition: transform 0.2s ease, background 0.2s ease !important;
+}
+
+.ig-tools-glass-icon-btn:hover {
+  transform: scale(1.1) !important;
+  background: rgba(30, 30, 36, 0.95) !important;
+}
+
+.ig-tools-post-overlay-dl {
+  display: none !important;
+}
+
+.ig-tools-story-dl-btn {
+  margin-left: 8px !important;
+  width: 32px !important;
+  height: 32px !important;
+  z-index: 999 !important;
+}
+
+/* Inline Post Action Bar Download Controls */
+.ig-tools-post-dl-container {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 40px !important;
+  margin: 0 4px !important;
+  vertical-align: middle !important;
+  line-height: 1 !important;
+}
+
+.ig-tools-post-bar-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 8px !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 50% !important;
+  color: currentColor !important;
+  cursor: pointer !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease !important;
+}
+
+.ig-tools-post-bar-btn:hover {
+  opacity: 0.7 !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  transform: scale(1.05) !important;
+}
+
+.ig-tools-post-bar-btn:active {
+  transform: scale(0.95) !important;
+  opacity: 0.5 !important;
+}
+
+.ig-tools-carousel-pill-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.4px !important;
+  padding: 3px 8px !important;
+  height: 22px !important;
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: currentColor !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  cursor: pointer !important;
+  margin-left: 2px !important;
+  transition: all 0.15s ease !important;
+}
+
+.ig-tools-carousel-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  transform: scale(1.04) !important;
+}
+  transition: all 0.15s ease;
+}
+
+.ig-tools-carousel-pill-btn:hover {
+  background: rgba(59, 130, 246, 0.35);
+  transform: scale(1.05);
+}
+
+.ig-tools-btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: ig-spin 0.7s linear infinite;
+}
+
+@keyframes ig-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   11. Top Toast Notification
+   ========================================================================== */
+
+#ig-tools-toast {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  z-index: 2147483647;
+  padding: 7px 14px;
+  background: rgba(18, 18, 20, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  color: #f4f4f5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#ig-tools-toast.ig-tools-toast-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   12. Focus Mode & Profile Notes
+   ========================================================================== */
+
+body.ig-tools-focus-mode a[href*="/reels/"],
+body.ig-tools-focus-mode a[href*="/explore/"],
+body.ig-tools-focus-mode svg[aria-label="Reels"],
+body.ig-tools-focus-mode svg[aria-label="Explore"] {
+  display: none !important;
+}
+
+.ig-tools-note-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  padding: 4px 10px;
+  margin-top: 8px;
+  color: #c4b5fd;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ig-tools-note-text {
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ig-tools-muted-story-item {
+  opacity: 0.25 !important;
+  filter: grayscale(1) !important;
+}
+
+/* ==========================================================================
+   13. Comments Lightbox
+   ========================================================================== */
+
+.ig-tools-comment-attachment {
+  border-radius: 8px !important;
+  max-width: 180px !important;
+  max-height: 180px !important;
+  object-fit: cover !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  cursor: zoom-in !important;
+  margin-top: 6px !important;
+  transition: transform 0.15s ease;
+}
+
+.ig-tools-comment-attachment:hover {
+  transform: scale(1.03);
+}
+
+.ig-tools-lightbox-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+
+.ig-tools-lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.ig-tools-lightbox-img {
+  max-width: 100%;
+  max-height: 85vh;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.ig-tools-lightbox-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  background: #27272a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.ig-tools-afc-empty-msg {
+  font-size: 11px;
+  color: #a1a1aa;
+  font-weight: 500;
+  padding: 2px 2px;
+}
+
+/* ==========================================================================
+   14. Reels Video Progress Slider & Controls
+   ========================================================================== */
+
+/* ==========================================================================
+   Remove built-in audio / mute control from Instagram Reels
+   ========================================================================== */
+button:not(.ig-tools-reel-slider-bar button):not(.ig-tools-auto-friends-card button)[aria-label*="audio" i],
+button:not(.ig-tools-reel-slider-bar button):not(.ig-tools-auto-friends-card button)[aria-label*="sound" i],
+button:not(.ig-tools-reel-slider-bar button):not(.ig-tools-auto-friends-card button)[aria-label*="mute" i],
+button:not(.ig-tools-reel-slider-bar button):not(.ig-tools-auto-friends-card button)[aria-label*="sunet" i],
+button:not(.ig-tools-reel-slider-bar button):not(.ig-tools-auto-friends-card button)[aria-label*="volum" i],
+button:not(.ig-tools-reel-slider-bar button):not(.ig-tools-auto-friends-card button)[aria-label*="piesă" i],
+button:not(.ig-tools-reel-slider-bar button):not(.ig-tools-auto-friends-card button)[aria-label*="piesa" i],
+button:not(.ig-tools-reel-slider-bar button):not(.ig-tools-auto-friends-card button)[aria-label*="comut" i],
+button:not(.ig-tools-reel-slider-bar button):not(.ig-tools-auto-friends-card button)[aria-label*="ton" i],
+div[role="button"]:not(.ig-tools-reel-slider-bar *):not(.ig-tools-auto-friends-card *)[aria-label*="audio" i],
+div[role="button"]:not(.ig-tools-reel-slider-bar *):not(.ig-tools-auto-friends-card *)[aria-label*="sound" i],
+div[role="button"]:not(.ig-tools-reel-slider-bar *):not(.ig-tools-auto-friends-card *)[aria-label*="mute" i],
+div[role="button"]:not(.ig-tools-reel-slider-bar *):not(.ig-tools-auto-friends-card *)[aria-label*="sunet" i],
+div[role="button"]:not(.ig-tools-reel-slider-bar *):not(.ig-tools-auto-friends-card *)[aria-label*="volum" i],
+div[role="button"]:not(.ig-tools-reel-slider-bar *):not(.ig-tools-auto-friends-card *)[aria-label*="piesă" i],
+div[role="button"]:not(.ig-tools-reel-slider-bar *):not(.ig-tools-auto-friends-card *)[aria-label*="piesa" i],
+div[role="button"]:not(.ig-tools-reel-slider-bar *):not(.ig-tools-auto-friends-card *)[aria-label*="comut" i],
+div[role="button"]:not(.ig-tools-reel-slider-bar *):not(.ig-tools-auto-friends-card *)[aria-label*="ton" i],
+[data-ig-tools-hidden-audio="true"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+#ig-tools-active-reel-slider,
+.ig-tools-reel-slider-bar {
+  position: fixed !important;
+  height: 38px !important;
+  z-index: 2147483647 !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  pointer-events: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  background: rgba(12, 12, 18, 0.92) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.75), 0 0 12px rgba(168, 85, 247, 0.15) !important;
+  transition: background 0.2s ease, opacity 0.2s ease;
+  box-sizing: border-box !important;
+}
+
+#ig-tools-active-reel-slider:hover,
+.ig-tools-reel-slider-bar:hover,
+.ig-tools-reel-slider-bar.is-active,
+.ig-tools-reel-slider-bar.is-seeking {
+  background: rgba(12, 12, 18, 0.97) !important;
+  border-color: rgba(168, 85, 247, 0.45) !important;
+}
+
+/* Expanded controls permanently interactive with clearance for Instagram native volume button */
+.ig-tools-slider-expanded-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 10px !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Play/Pause & Step & Mute Buttons */
+.ig-tools-slider-play-btn,
+.ig-tools-slider-step-btn,
+.ig-tools-slider-mute-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: inherit !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  padding: 0 6px !important;
+  box-sizing: border-box !important;
+  transition: background 0.15s ease, transform 0.15s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.ig-tools-slider-play-btn:hover,
+.ig-tools-slider-step-btn:hover,
+.ig-tools-slider-mute-btn:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  transform: scale(1.05);
+}
+
+.ig-tools-slider-play-btn:active,
+.ig-tools-slider-step-btn:active,
+.ig-tools-slider-mute-btn:active {
+  transform: scale(0.95);
+}
+
+.ig-tools-slider-mute-btn.is-active,
+.ig-tools-slider-mute-btn[data-state="unmuted"] {
+  background: rgba(168, 85, 247, 0.25) !important;
+  border-color: rgba(168, 85, 247, 0.55) !important;
+  color: #c4b5fd !important;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.4) !important;
+}
+
+.ig-tools-slider-mute-btn.is-active:hover,
+.ig-tools-slider-mute-btn[data-state="unmuted"]:hover {
+  background: rgba(168, 85, 247, 0.4) !important;
+  color: #ffffff !important;
+  transform: scale(1.05) !important;
+}
+
+.ig-tools-slider-mute-btn[data-state="muted"] {
+  background: rgba(239, 68, 68, 0.16) !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  color: #fca5a5 !important;
+}
+
+/* Seek track & input */
+.ig-tools-slider-range-box {
+  position: relative !important;
+  flex: 1 !important;
+  height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  touch-action: none !important;
+}
+
+.ig-tools-slider-track-bg {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 4px !important;
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-radius: 2px !important;
+  pointer-events: none !important;
+}
+
+.ig-tools-slider-fill {
+  position: absolute !important;
+  left: 0 !important;
+  height: 4px !important;
+  width: 0%;
+  background: linear-gradient(90deg, #3b82f6, #a855f7, #ec4899) !important;
+  border-radius: 2px !important;
+  pointer-events: none !important;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.6);
+}
+
+.ig-tools-slider-input {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 1 !important;
+  background: transparent !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  margin: 0 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 2 !important;
+}
+
+.ig-tools-slider-input:focus {
+  outline: none;
+}
+
+.ig-tools-slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 13px !important;
+  height: 13px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6), 0 0 6px #a855f7 !important;
+  cursor: pointer !important;
+  transition: transform 0.12s ease !important;
+}
+
+.ig-tools-slider-input:hover::-webkit-slider-thumb,
+.ig-tools-slider-input:active::-webkit-slider-thumb {
+  transform: scale(1.35) !important;
+}
+
+.ig-tools-slider-input::-moz-range-thumb {
+  width: 13px !important;
+  height: 13px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6), 0 0 6px #a855f7 !important;
+  cursor: pointer !important;
+}
+
+/* Time display */
+.ig-tools-slider-time-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #f4f4f5 !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+  min-width: 72px !important;
+  text-align: center !important;
+}
+
+/* Speed badge */
+.ig-tools-slider-speed-badge {
+  background: rgba(139, 92, 246, 0.22) !important;
+  border: 1px solid rgba(139, 92, 246, 0.4) !important;
+  color: #c4b5fd !important;
+  border-radius: 6px !important;
+  font-family: inherit !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  height: 24px !important;
+  padding: 0 7px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.15s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.ig-tools-slider-speed-badge:hover {
+  background: rgba(139, 92, 246, 0.45) !important;
+  color: #ffffff !important;
+  transform: scale(1.06) !important;
+}
+
+/* ==========================================================================
+   15. Reel Volume HUD Overlay
+   ========================================================================== */
+
+.ig-tools-volume-hud {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(0.9) !important;
+  z-index: 2147483645 !important;
+  pointer-events: none !important;
+  opacity: 0;
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.ig-tools-volume-hud.visible {
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+.ig-tools-volume-hud-content {
+  background: rgba(12, 12, 16, 0.92) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 9999px !important;
+  padding: 8px 16px !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.8), 0 0 15px rgba(168, 85, 247, 0.35) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  user-select: none !important;
+}
+
+.ig-tools-volume-hud-icon {
+  font-size: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.ig-tools-volume-hud-bar-wrap {
+  width: 90px !important;
+  height: 6px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 3px !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+.ig-tools-volume-hud-fill {
+  height: 100% !important;
+  background: linear-gradient(90deg, #3b82f6, #a855f7, #ec4899) !important;
+  border-radius: 3px !important;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.8) !important;
+  transition: width 0.08s ease !important;
+}
+
+.ig-tools-volume-hud-text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  min-width: 38px !important;
+  text-align: right !important;
+}
+
+

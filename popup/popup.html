@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IG Tools</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --card-bg: #18181b;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent: #22c55e;
+      --accent-glow: rgba(34, 197, 94, 0.2);
+      --ig-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 340px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      padding: 16px;
+      user-select: none;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--ig-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      box-shadow: 0 4px 12px rgba(225, 48, 108, 0.3);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .badge-status {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .badge-status.inactive {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    /* Card */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.2s ease;
+    }
+
+    .card.highlight {
+      border-color: rgba(34, 197, 94, 0.3);
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    /* Master Switch Row */
+    .master-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .master-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .master-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .master-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #27272a;
+      transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #71717a;
+      transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent);
+      border-color: transparent;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+      background-color: #ffffff;
+    }
+
+    /* Sub Options */
+    .sub-options {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .option-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .option-hint {
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+
+    .mini-switch {
+      width: 36px;
+      height: 20px;
+    }
+
+    .mini-switch .slider:before {
+      height: 14px;
+      width: 14px;
+      left: 2px;
+      bottom: 2px;
+    }
+
+    .mini-switch input:checked + .slider:before {
+      transform: translateX(16px);
+    }
+
+    /* Section Header */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 8px 6px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .stat-lbl {
+      font-size: 9.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-top: 2px;
+    }
+
+    .stats-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-reset {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 10.5px;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    .btn-reset:hover {
+      color: #ef4444;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 10.5px;
+      color: #71717a;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-logo">⚡</div>
+      <div class="brand-title">IG Tools</div>
+    </div>
+    <span id="badge-status" class="badge-status">Active</span>
+  </div>
+
+  <button id="btn-open-control-center" style="width: 100%; margin-bottom: 12px; padding: 9px 12px; border-radius: 12px; border: none; background: linear-gradient(135deg, #ec4899, #8b5cf6); color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 14px rgba(236,72,153,0.35);">
+    <span>⚡ Open Assistant Side Panel</span>
+  </button>
+
+  <!-- Master Ghost Mode Card -->
+  <div id="card-master" class="card highlight">
+    <div class="master-row">
+      <div class="master-info">
+        <span class="master-title">👻 Ghost Mode</span>
+        <span class="master-sub">Browse Stories & DMs completely unseen</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="toggle-ghost-master" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Ghost Controls Card -->
+  <div class="card">
+    <div class="section-title">Ghost Mode Features</div>
+    <div class="sub-options">
+      <div class="option-row">
+        <div>
+          <div class="option-label">Block Story Seen</div>
+          <div class="option-hint">Don't trigger viewed receipts on Stories</div>
+        </div>
+        <label class="switch mini-switch">
+          <input type="checkbox" id="toggle-ghost-stories" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="option-row">
+        <div>
+          <div class="option-label">Block DM Read Receipts</div>
+          <div class="option-hint">Don't send seen when opening messages</div>
+        </div>
+        <label class="switch mini-switch">
+          <input type="checkbox" id="toggle-ghost-dms" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="option-row">
+        <div>
+          <div class="option-label">On-Page Quick Toggle</div>
+          <div class="option-hint">Floating pill widget on Instagram</div>
+        </div>
+        <label class="switch mini-switch">
+          <input type="checkbox" id="toggle-widget" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tools & Modules Card -->
+  <div class="card">
+    <div class="section-title">Enhanced Tools</div>
+    <div class="sub-options">
+      <div class="option-row">
+        <div>
+          <div class="option-label">Media Downloader</div>
+          <div class="option-hint">Posts, Reels, Stories, Carousels</div>
+        </div>
+        <label class="switch mini-switch">
+          <input type="checkbox" id="toggle-downloader" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="option-row">
+        <div>
+          <div class="option-label">Friends Who Liked (Reels)</div>
+          <div class="option-hint">Show followed accounts that liked</div>
+        </div>
+        <label class="switch mini-switch">
+          <input type="checkbox" id="toggle-friends" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="option-row">
+        <div>
+          <div class="option-label">Better Comments (Reels)</div>
+          <div class="option-hint">Media attachments, search & auto-load</div>
+        </div>
+        <label class="switch mini-switch">
+          <input type="checkbox" id="toggle-comments" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="option-row">
+        <div>
+          <div class="option-label">Reels Video Progress Slider</div>
+          <div class="option-hint">Seekbar, scrubber & quick &plusmn;5s seeking</div>
+        </div>
+        <label class="switch mini-switch">
+          <input type="checkbox" id="toggle-reel-slider" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Stats Card -->
+  <div class="card">
+    <div class="section-title">Session Activity</div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div id="stat-stories" class="stat-val">0</div>
+        <div class="stat-lbl">Stories Unseen</div>
+      </div>
+      <div class="stat-box">
+        <div id="stat-dms" class="stat-val">0</div>
+        <div class="stat-lbl">DMs Unseen</div>
+      </div>
+      <div class="stat-box">
+        <div id="stat-downloads" class="stat-val">0</div>
+        <div class="stat-lbl">Downloaded</div>
+      </div>
+    </div>
+    <div class="stats-footer">
+      <span id="stat-last-time" style="font-size: 10px; color: #71717a;">Ready</span>
+      <button id="btn-reset-stats" class="btn-reset">Reset</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    IG Tools • 100% Local • Zero tracking
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
