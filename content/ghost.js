@@ -12,37 +12,10 @@
   }
   window.__IG_TOOLS_GHOST_INITIALIZED__ = true;
 
-  // 1. Immediately eliminate SharedWorker so Instagram never connects to background workers
-  try {
-    delete window.SharedWorker;
-  } catch (e) {}
-  try {
-    if (window.__proto__) delete window.__proto__.SharedWorker;
-  } catch (e) {}
-  try {
-    Object.defineProperty(window, 'SharedWorker', {
-      get() { return undefined; },
-      set() {},
-      configurable: false
-    });
-  } catch (e) {}
-
-  // 2. Unregister any active Service Workers so background workers cannot leak seen receipts
-  if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-    try {
-      navigator.serviceWorker.getRegistrations().then((registrations) => {
-        for (const reg of registrations) {
-          reg.unregister().catch(() => {});
-        }
-      }).catch(() => {});
-    } catch (e) {}
-  }
-
   // Active configuration (restored synchronously from localStorage fallback)
   let config = {
     ghostMode: true,
-    ghostStories: true,
-    ghostDMs: true
+    ghostStories: true
   };
 
   try {
@@ -174,128 +147,12 @@
     return false;
   }
 
-  /**
-   * Evaluates if request is a Direct Message (DM) seen / read receipt request.
-   * Strictly targets POST seen mutations and NEVER blocks GET or message queries.
-   */
-  /**
-   * Evaluates if request is a Direct Message (DM) seen / read receipt request.
-   * Strictly targets POST seen mutations and NEVER blocks GET or message queries.
-   */
-  function isDMSeenRequest(url, method, bodyText, friendlyName = '') {
-    if (!url) return false;
-    // Seen receipts are ALWAYS POST requests. GET requests fetch conversations/inbox!
-    if (method !== 'POST') return false;
-
-    const lowerUrl = url.toLowerCase();
-    const lowerBody = (bodyText || '').toLowerCase();
-    const lowerFn = (friendlyName || '').toLowerCase();
-    const combined = lowerUrl + ' ' + lowerBody + ' ' + lowerFn;
-
-    // Safe-guard 1: NEVER intercept message sending
-    if (
-      lowerBody.includes('client_context') ||
-      lowerBody.includes('send_message') ||
-      lowerBody.includes('createmessage') ||
-      lowerBody.includes('mutation_token') ||
-      (lowerBody.includes('action%22%3A%22send') || lowerBody.includes('action":"send')) ||
-      lowerFn.includes('sendmessage') ||
-      lowerFn.includes('createmessage')
-    ) {
-      return false;
-    }
-
-    // Safe-guard 2: NEVER intercept conversation queries or message loading
-    if (
-      lowerBody.includes('directthreadquery') ||
-      lowerBody.includes('polarisdirectthreadquery') ||
-      lowerBody.includes('polarisdirectinbox') ||
-      lowerBody.includes('messagelistquery') ||
-      lowerBody.includes('fetchthread') ||
-      lowerBody.includes('%22cursor%22') ||
-      lowerBody.includes('"cursor"') ||
-      lowerFn.includes('directthreadquery') ||
-      lowerFn.includes('polarisdirectthreadquery') ||
-      lowerFn.includes('polarisdirectinbox') ||
-      lowerFn.includes('messagelist')
-    ) {
-      return false;
-    }
-
-    // 1. Explicit REST endpoints for DM seen receipts
-    if (
-      (lowerUrl.includes('/api/v1/direct_v2/threads/') && (lowerUrl.includes('seen') || lowerUrl.includes('read'))) ||
-      lowerUrl.includes('/direct_v2/threads/batched_seen') ||
-      lowerUrl.includes('/direct_v2/threads/activity_status_seen') ||
-      lowerUrl.includes('/direct_v2/visual_threads/item_seen') ||
-      lowerUrl.includes('/seen_direct_thread') ||
-      lowerUrl.includes('/direct_v2/threads/item_seen')
-    ) {
-      return true;
-    }
-
-    // 2. Direct telemetry pings specifically reporting thread seen
-    if (
-      (lowerUrl.includes('logging_client_events') || lowerUrl.includes('/ajax/bz')) &&
-      (
-        lowerBody.includes('direct_v2_seen') ||
-        lowerBody.includes('mark_thread_seen') ||
-        lowerBody.includes('thread_item_seen') ||
-        lowerBody.includes('watermark')
-      )
-    ) {
-      return true;
-    }
-
-    // 3. GraphQL mutations for DM seen receipts (blocks primary and validation mutations)
-    if (lowerUrl.includes('/graphql/query') || lowerUrl.includes('/api/graphql')) {
-      const dmKeywords = [
-        'useigdmarkthreadasread',
-        'igdmarkthreadasread',
-        'markthreadasread',
-        'markthreaditemseen',
-        'readvalidation',
-        'validation',
-        'polarisdirectmarkthreadseen',
-        'polarisdirectthreadseen',
-        'polarisdirectseen',
-        'directmutationmarkthreaditemseen',
-        'directthreadseen',
-        'polarisdirectmutationmarkthreaditemseen',
-        'polarisdirectvisualitemseen',
-        'polarisdirectmarkvisualmessageseen',
-        'polarisdirectmarkactivityseen',
-        'usedirectmutationmarkthreaditemseen',
-        'direct_v2_seen',
-        'direct_v2_threads_seen',
-        'mark_thread_seen',
-        'mark_thread_read'
-      ];
-
-      for (const keyword of dmKeywords) {
-        if (combined.includes(keyword)) {
-          return true;
-        }
-      }
-
-      // Watermark confirmations
-      if (
-        (combined.includes('thread_id') || combined.includes('thread_fbid')) &&
-        (combined.includes('watermark') || combined.includes('seen_watermark') || combined.includes('read_watermark'))
-      ) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   function notifyBlocked(targetType, url) {
     try {
       window.postMessage(
         {
           type: 'IG_TOOLS_SEEN_BLOCKED',
-          targetType, // 'story' or 'dm'
+          targetType, // 'story'
           url,
           timestamp: Date.now()
         },
@@ -399,19 +256,11 @@
 
     const isGhostOn = Boolean(config.ghostMode);
     const blockStories = isGhostOn && Boolean(config.ghostStories);
-    const blockDMs = isGhostOn && Boolean(config.ghostDMs);
 
-    // Story Seen
+    // Story Seen (Hardware-fast blocking)
     if (blockStories && isStorySeenRequest(url, method, bodyText, friendlyName)) {
       console.warn(`${LOG_PREFIX} 👻 Blocked Story "seen" fetch:`, url);
       notifyBlocked('story', url);
-      return createSyntheticResponse(url);
-    }
-
-    // DM Seen
-    if (blockDMs && isDMSeenRequest(url, method, bodyText, friendlyName)) {
-      console.warn(`${LOG_PREFIX} 👻 Blocked DM "seen" fetch:`, url, friendlyName);
-      notifyBlocked('dm', url);
       return createSyntheticResponse(url);
     }
 
@@ -853,27 +702,15 @@
   XMLHttpRequest.prototype.send = function (body) {
     const isGhostOn = Boolean(config.ghostMode);
     const blockStories = isGhostOn && Boolean(config.ghostStories);
-    const blockDMs = isGhostOn && Boolean(config.ghostDMs);
 
     const url = this._igToolsUrl || '';
     const method = this._igToolsMethod || 'GET';
     const bodyText = extractBodyTextSync(body);
     const friendlyName = this._igToolsFriendlyName || (url.match(/[?&]fb_api_req_friendly_name=([^&]+)/)?.[1] ? decodeURIComponent(url.match(/[?&]fb_api_req_friendly_name=([^&]+)/)[1]) : '');
 
-    let shouldBlock = false;
-    let targetType = null;
-
     if (blockStories && isStorySeenRequest(url, method, bodyText, friendlyName)) {
-      shouldBlock = true;
-      targetType = 'story';
-    } else if (blockDMs && isDMSeenRequest(url, method, bodyText, friendlyName)) {
-      shouldBlock = true;
-      targetType = 'dm';
-    }
-
-    if (shouldBlock) {
-      console.warn(`${LOG_PREFIX} 👻 Blocked XHR "${targetType}" seen request:`, url);
-      notifyBlocked(targetType, url);
+      console.warn(`${LOG_PREFIX} 👻 Blocked XHR Story seen request:`, url);
+      notifyBlocked('story', url);
 
       setTimeout(() => {
         try {
@@ -919,17 +756,10 @@
 
       const isGhostOn = Boolean(config.ghostMode);
       const blockStories = isGhostOn && Boolean(config.ghostStories);
-      const blockDMs = isGhostOn && Boolean(config.ghostDMs);
 
       if (blockStories && isStorySeenRequest(urlStr, 'POST', bodyText)) {
         console.warn(`${LOG_PREFIX} 👻 Blocked Story sendBeacon:`, urlStr);
         notifyBlocked('story', urlStr);
-        return true;
-      }
-
-      if (blockDMs && isDMSeenRequest(urlStr, 'POST', bodyText)) {
-        console.warn(`${LOG_PREFIX} 👻 Blocked DM sendBeacon:`, urlStr);
-        notifyBlocked('dm', urlStr);
         return true;
       }
 
@@ -938,318 +768,7 @@
   }
 
   // =========================================================================
-  // 4. Intercept window.WebSocket (MQTT Outgoing Read Receipts)
-  // =========================================================================
-  if (typeof window.WebSocket !== 'undefined') {
-    const OriginalWebSocket = window.WebSocket;
-
-    window.WebSocket = function (...args) {
-      const socket = new OriginalWebSocket(...args);
-      const originalSocketSend = socket.send;
-
-      socket.send = function (data) {
-        const isGhostOn = Boolean(config.ghostMode);
-        const blockDMs = isGhostOn && Boolean(config.ghostDMs);
-
-        if (blockDMs && data) {
-          try {
-            let strContent = '';
-            if (typeof data === 'string') {
-              strContent = data;
-            } else if (data instanceof ArrayBuffer) {
-              strContent = new TextDecoder('utf-8', { fatal: false }).decode(data);
-            } else if (ArrayBuffer.isView(data)) {
-              strContent = new TextDecoder('utf-8', { fatal: false }).decode(data.buffer);
-            }
-
-            if (strContent) {
-              const lower = strContent.toLowerCase();
-              if (
-                lower.includes('/mark_thread_seen') ||
-                lower.includes('mark_thread_seen') ||
-                lower.includes('seen_watermark') ||
-                lower.includes('read_watermark') ||
-                (lower.includes('/t_ms') && lower.includes('watermark'))
-              ) {
-                console.warn(`${LOG_PREFIX} 👻 Suppressed WebSocket MQTT DM seen packet.`);
-                notifyBlocked('dm', 'wss://edge-chat');
-                return; // Drop packet
-              }
-            }
-          } catch (e) {}
-        }
-
-        return originalSocketSend.apply(this, arguments);
-      };
-
-      return socket;
-    };
-
-    window.WebSocket.CONNECTING = OriginalWebSocket.CONNECTING;
-    window.WebSocket.OPEN = OriginalWebSocket.OPEN;
-    window.WebSocket.CLOSING = OriginalWebSocket.CLOSING;
-    window.WebSocket.CLOSED = OriginalWebSocket.CLOSED;
-    window.WebSocket.prototype = OriginalWebSocket.prototype;
-  }
-
-  // =========================================================================
-  // 5. Intercept MessagePort & SharedWorker (Blocks Worker DM read receipts)
-  // =========================================================================
-
-  function isDMSeenData(data) {
-    if (!data) return false;
-    try {
-      let str = '';
-      if (typeof data === 'string') {
-        str = data;
-      } else if (typeof data === 'object') {
-        const actionLower = String(data.action || data.type || data.name || data.mutation || data.operationName || '').toLowerCase();
-        if (
-          actionLower.includes('mark_thread_seen') ||
-          actionLower.includes('markthreadasread') ||
-          actionLower.includes('mark_thread_read') ||
-          actionLower.includes('readvalidation') ||
-          actionLower.includes('read_validation') ||
-          actionLower.includes('seen_watermark') ||
-          actionLower.includes('read_watermark') ||
-          actionLower.includes('item_seen') ||
-          actionLower.includes('batched_seen')
-        ) {
-          if (
-            actionLower.includes('query') ||
-            actionLower.includes('fetch') ||
-            actionLower.includes('inbox') ||
-            actionLower.includes('ready')
-          ) {
-            return false;
-          }
-          return true;
-        }
-        str = JSON.stringify(data);
-      }
-
-      if (str) {
-        const lower = str.toLowerCase();
-        // Never block conversation queries or inbox loading
-        if (
-          lower.includes('directthreadquery') ||
-          lower.includes('polarisdirectthreadquery') ||
-          lower.includes('polarisdirectinbox') ||
-          lower.includes('fetchthread') ||
-          lower.includes('messagelistquery') ||
-          lower.includes('ready')
-        ) {
-          return false;
-        }
-
-        const seenKeywords = [
-          'markthreadasread',
-          'mark_thread_seen',
-          'markthreaditemseen',
-          'mark_thread_read',
-          'readvalidation',
-          'read_validation',
-          'useigdmarkthreadasreadvalidationmutation',
-          'polarisdirectmarkthreadseen',
-          'polarisdirectmarkthreadread',
-          'polarisdirectmarkactivityseen',
-          'directmutationmarkthreaditemseen',
-          'seen_watermark',
-          'read_watermark',
-          'seen_direct_thread',
-          'activity_status_seen',
-          'batched_seen'
-        ];
-
-        for (const kw of seenKeywords) {
-          if (lower.includes(kw)) return true;
-        }
-
-        if (
-          (lower.includes('watermark') || lower.includes('action_type%22%3A%22seen') || lower.includes('action":"seen')) &&
-          (lower.includes('thread_id') || lower.includes('thread_fbid'))
-        ) {
-          return true;
-        }
-      }
-    } catch (e) {}
-    return false;
-  }
-
-  // Intercept MessagePort.prototype.postMessage
-  if (typeof MessagePort !== 'undefined') {
-    const originalPortPostMessage = MessagePort.prototype.postMessage;
-    MessagePort.prototype.postMessage = function (data, ...args) {
-      const isGhostOn = Boolean(config.ghostMode);
-      const blockDMs = isGhostOn && Boolean(config.ghostDMs);
-
-      if (blockDMs && isDMSeenData(data)) {
-        console.warn(`${LOG_PREFIX} 👻 Suppressed MessagePort DM seen data:`, data);
-        notifyBlocked('dm', 'MessagePort');
-        return;
-      }
-      return originalPortPostMessage.apply(this, [data, ...args]);
-    };
-  }
-
-  // Helper to sandbox Worker & SharedWorker scripts with in-worker fetch & WebSocket patches
-  function createPatchedWorkerBlobUrl(scriptURL, isModule) {
-    let fullUrl = scriptURL;
-    try {
-      fullUrl = new URL(scriptURL, window.location.href).href;
-    } catch (e) {}
-
-    const workerPatchCode = `
-// IG Tools Worker Sandbox Patch (injected into worker environment)
-(function() {
-  var _origFetch = self.fetch;
-  if (_origFetch) {
-    self.fetch = async function(input, init) {
-      var url = '';
-      var method = 'GET';
-      var fn = '';
-      var bodyText = '';
-      try {
-        if (typeof input === 'string') url = input;
-        else if (input && input.url) { url = input.url; method = input.method || 'GET'; }
-        if (init && init.method) method = init.method.toUpperCase();
-        if (init && init.headers) {
-          if (typeof init.headers.get === 'function') fn = init.headers.get('x-fb-friendly-name') || init.headers.get('X-FB-Friendly-Name') || '';
-          else if (typeof init.headers === 'object') fn = init.headers['x-fb-friendly-name'] || init.headers['X-FB-Friendly-Name'] || '';
-        } else if (input && input.headers) {
-          if (typeof input.headers.get === 'function') fn = input.headers.get('x-fb-friendly-name') || input.headers.get('X-FB-Friendly-Name') || '';
-        }
-        if (init && init.body) {
-          if (typeof init.body === 'string') bodyText = init.body;
-        }
-      } catch(e) {}
-
-      var lowerFn = (fn || '').toLowerCase();
-      var lowerUrl = (url || '').toLowerCase();
-      var lowerBody = (bodyText || '').toLowerCase();
-
-      // Protect conversation message loading
-      if (
-        lowerFn.includes('directthreadquery') ||
-        lowerFn.includes('polarisdirectthreadquery') ||
-        lowerFn.includes('polarisdirectinbox') ||
-        lowerFn.includes('messagelist') ||
-        lowerBody.includes('directthreadquery') ||
-        lowerBody.includes('polarisdirectthreadquery') ||
-        lowerBody.includes('fetchthread')
-      ) {
-        return _origFetch.apply(this, arguments);
-      }
-
-      // Block DM read validation mutations in worker
-      if (
-        lowerFn.includes('markthreadasread') ||
-        lowerFn.includes('useigdmarkthreadasread') ||
-        lowerFn.includes('igdmarkthreadasread') ||
-        lowerFn.includes('readvalidation') ||
-        lowerFn.includes('markthreaditemseen') ||
-        lowerFn.includes('polarisdirectmarkthreadseen') ||
-        lowerBody.includes('markthreadasread') ||
-        lowerBody.includes('useigdmarkthreadasread') ||
-        lowerBody.includes('readvalidation') ||
-        (lowerUrl.includes('/direct_v2/threads/') && (lowerUrl.includes('seen') || lowerUrl.includes('read')))
-      ) {
-        console.warn('[IG Tools Worker] 👻 Blocked DM read validation mutation in worker:', fn || url);
-        var mockData = JSON.stringify({
-          data: {
-            useIGDMarkThreadAsReadValidationMutation: { status: 'ok', client_mutation_id: '1' },
-            useIGDMarkThreadAsReadMutation: { status: 'ok', client_mutation_id: '1' },
-            igd_mark_thread_as_read: { status: 'ok' },
-            mark_thread_seen: { status: 'ok' }
-          },
-          status: 'ok'
-        });
-        return new Response(mockData, {
-          status: 200,
-          statusText: 'OK',
-          headers: new Headers({ 'Content-Type': 'application/json', 'X-IG-Tools-Worker-Ghost': 'true' })
-        });
-      }
-
-      return _origFetch.apply(this, arguments);
-    };
-  }
-
-  // Intercept WebSocket inside worker
-  var _origWS = self.WebSocket;
-  if (_origWS) {
-    self.WebSocket = function(...args) {
-      var ws = new _origWS(...args);
-      var _origSend = ws.send;
-      ws.send = function(data) {
-        try {
-          var str = typeof data === 'string' ? data : '';
-          if (!str && data instanceof ArrayBuffer) {
-            str = new TextDecoder().decode(data);
-          }
-          if (str) {
-            var lower = str.toLowerCase();
-            if (
-              lower.includes('watermark') ||
-              lower.includes('/mark_thread_seen') ||
-              lower.includes('mark_thread_seen') ||
-              lower.includes('read_watermark') ||
-              lower.includes('seen_watermark')
-            ) {
-              console.warn('[IG Tools Worker] 👻 Suppressed worker WebSocket seen packet');
-              return;
-            }
-          }
-        } catch(e) {}
-        return _origSend.apply(this, arguments);
-      };
-      return ws;
-    };
-  }
-})();
-\${isModule ? \`import \${JSON.stringify(fullUrl)};\` : \`importScripts(\${JSON.stringify(fullUrl)});\`}
-`;
-    const blob = new Blob([workerPatchCode], { type: 'application/javascript' });
-    return URL.createObjectURL(blob);
-  }
-
-  // Intercept window.SharedWorker
-  if (typeof window.SharedWorker !== 'undefined') {
-    const OriginalSharedWorker = window.SharedWorker;
-    window.SharedWorker = function (scriptURL, options) {
-      console.log(`${LOG_PREFIX} SharedWorker instantiated:`, scriptURL);
-      try {
-        const isModule = options && (options === 'module' || options.type === 'module');
-        const blobUrl = createPatchedWorkerBlobUrl(scriptURL, isModule);
-        return new OriginalSharedWorker(blobUrl, options);
-      } catch (e) {
-        console.warn(`${LOG_PREFIX} SharedWorker wrapping failed, falling back to original:`, e);
-        return new OriginalSharedWorker(scriptURL, options);
-      }
-    };
-    window.SharedWorker.prototype = OriginalSharedWorker.prototype;
-  }
-
-  // Intercept window.Worker (Dedicated Web Workers)
-  if (typeof window.Worker !== 'undefined') {
-    const OriginalWorker = window.Worker;
-    window.Worker = function (scriptURL, options) {
-      console.log(`${LOG_PREFIX} Dedicated Worker instantiated:`, scriptURL);
-      try {
-        const isModule = options && (options === 'module' || options.type === 'module');
-        const blobUrl = createPatchedWorkerBlobUrl(scriptURL, isModule);
-        const worker = new OriginalWorker(blobUrl, options);
-        return worker;
-      } catch (e) {
-        console.warn(`${LOG_PREFIX} Worker wrapping failed, falling back to original:`, e);
-        return new OriginalWorker(scriptURL, options);
-      }
-    };
-    window.Worker.prototype = OriginalWorker.prototype;
-  }
-
-  // =========================================================================
-  // 6. MAIN-World Event Isolation (Prevents Reel Click-to-Pause in React)
+  // 4. MAIN-World Event Isolation (Prevents Reel Click-to-Pause in React)
   // =========================================================================
   const buttonEventTypes = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'touchstart', 'touchend', 'click'];
   buttonEventTypes.forEach((evtType) => {

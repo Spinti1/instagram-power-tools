@@ -74,8 +74,9 @@ window.IGTools.friendsLiked = (() => {
     console.log(`${LOG_PREFIX} Module initialized (Body-Anchored Persistent Card).`);
 
     const onReady = () => {
-      getOrCreateCard();
-      checkActiveReel();
+      if (isReelContext(null)) {
+        checkActiveReel();
+      }
     };
 
     if (document.readyState === 'loading') {
@@ -87,9 +88,12 @@ window.IGTools.friendsLiked = (() => {
     const onRouteChanged = () => {
       const card = document.getElementById('ig-tools-auto-friends-card');
       if (card && !isReelContext(null)) {
-        card.style.display = 'none';
+        card.classList.remove('is-visible');
+        card.remove();
       }
-      setTimeout(checkActiveReel, 120);
+      if (isReelContext(null)) {
+        setTimeout(checkActiveReel, 120);
+      }
     };
 
     // Listen to scroll, resize, play, and navigation events
@@ -204,6 +208,8 @@ window.IGTools.friendsLiked = (() => {
       !path ||
       path === '/' ||
       path === '' ||
+      path.startsWith('/p/') ||
+      path.includes('/p/') ||
       path.startsWith('/direct') ||
       path.includes('/direct/') ||
       path.startsWith('/accounts') ||
@@ -268,7 +274,7 @@ window.IGTools.friendsLiked = (() => {
       card = document.createElement('div');
       card.id = 'ig-tools-auto-friends-card';
       card.className = 'ig-tools-auto-friends-card';
-      card.style.display = 'none'; // Initially hidden until a valid Reel is actively confirmed
+      card.style.setProperty('display', 'none', 'important'); // Initially hidden until a valid Reel is confirmed
 
       // Initialize with visible Obsidian card template so it is never an empty 0-height element
       card.innerHTML = `
@@ -386,16 +392,12 @@ window.IGTools.friendsLiked = (() => {
    * Dynamically anchors the Who Liked card directly ABOVE the user/author who posted the current playing video.
    */
   function updateCardPosition(activeVideo) {
-    const card = getOrCreateCard();
+    const card = document.getElementById('ig-tools-auto-friends-card');
     if (!card) return;
 
-    if (!activeVideo || !activeVideo.isConnected) {
-      card.style.display = 'none';
-      return;
-    }
-
-    if (!isReelContext(activeVideo)) {
-      card.style.display = 'none';
+    if (!activeVideo || !activeVideo.isConnected || !isReelContext(activeVideo)) {
+      card.classList.remove('is-visible');
+      card.style.setProperty('display', 'none', 'important');
       return;
     }
 
@@ -404,11 +406,13 @@ window.IGTools.friendsLiked = (() => {
 
     // Check if Reel video is actually visible in viewport
     if (rect.height < 60 || rect.bottom < 60 || rect.top > windowH - 60) {
-      card.style.display = 'none';
+      card.classList.remove('is-visible');
+      card.style.setProperty('display', 'none', 'important');
       return;
     }
 
-    card.style.display = 'flex';
+    card.classList.add('is-visible');
+    card.style.removeProperty('display');
     const cardWidth = 240;
 
     const navRight = getLeftSidebarWidth();
@@ -637,8 +641,16 @@ window.IGTools.friendsLiked = (() => {
    */
   function checkActiveReel() {
     if (!document.body) return;
-    const card = getOrCreateCard();
-    if (!card) return;
+
+    // If NOT strictly in a Reel context, purge the card from DOM immediately!
+    if (!isReelContext(null)) {
+      const existing = document.getElementById('ig-tools-auto-friends-card');
+      if (existing) {
+        existing.classList.remove('is-visible');
+        existing.remove();
+      }
+      return;
+    }
 
     const videos = Array.from(document.querySelectorAll('video'));
     const visibleVideos = videos.filter((v) => {
@@ -647,7 +659,11 @@ window.IGTools.friendsLiked = (() => {
     });
 
     if (visibleVideos.length === 0) {
-      card.style.display = 'none';
+      const card = document.getElementById('ig-tools-auto-friends-card');
+      if (card) {
+        card.classList.remove('is-visible');
+        card.style.setProperty('display', 'none', 'important');
+      }
       return;
     }
 
@@ -672,9 +688,16 @@ window.IGTools.friendsLiked = (() => {
     }
 
     if (!activeVideo || !isReelContext(activeVideo)) {
-      card.style.display = 'none';
+      const card = document.getElementById('ig-tools-auto-friends-card');
+      if (card) {
+        card.classList.remove('is-visible');
+        card.style.setProperty('display', 'none', 'important');
+      }
       return;
     }
+
+    const card = getOrCreateCard();
+    if (!card) return;
 
     currentActiveVideo = activeVideo;
     updateCardPosition(activeVideo);

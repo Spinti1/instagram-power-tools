@@ -306,7 +306,7 @@
     <div class="master-row">
       <div class="master-info">
         <span class="master-title">👻 Ghost Mode</span>
-        <span class="master-sub">Browse Stories & DMs completely unseen</span>
+        <span class="master-sub">Watch Stories completely unseen</span>
       </div>
       <label class="switch">
         <input type="checkbox" id="toggle-ghost-master" checked>
@@ -326,17 +326,6 @@
         </div>
         <label class="switch mini-switch">
           <input type="checkbox" id="toggle-ghost-stories" checked>
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="option-row">
-        <div>
-          <div class="option-label">Block DM Read Receipts</div>
-          <div class="option-hint">Don't send seen when opening messages</div>
-        </div>
-        <label class="switch mini-switch">
-          <input type="checkbox" id="toggle-ghost-dms" checked>
           <span class="slider"></span>
         </label>
       </div>
@@ -407,18 +396,14 @@
   <!-- Activity Stats Card -->
   <div class="card">
     <div class="section-title">Session Activity</div>
-    <div class="stats-grid">
+    <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
       <div class="stat-box">
         <div id="stat-stories" class="stat-val">0</div>
         <div class="stat-lbl">Stories Unseen</div>
       </div>
       <div class="stat-box">
-        <div id="stat-dms" class="stat-val">0</div>
-        <div class="stat-lbl">DMs Unseen</div>
-      </div>
-      <div class="stat-box">
         <div id="stat-downloads" class="stat-val">0</div>
-        <div class="stat-lbl">Downloaded</div>
+        <div class="stat-lbl">Media Downloaded</div>
       </div>
     </div>
     <div class="stats-footer">

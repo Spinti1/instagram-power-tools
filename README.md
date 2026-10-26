@@ -15,10 +15,10 @@
 
 ## 🌟 Key Features
 
-### 👻 Ghost Mode (100% Stealth)
+### 👻 Ghost Mode (100% Stealth Stories)
 - **Unseen Stories:** Watch any Instagram Story without adding your name or account to the viewer list.
-- **Unread DMs:** Read direct messages and threads completely stealthily without triggering seen receipts, typing indicators, or delivery timestamps.
-- **Dual Firewall:** Employs hardware-level Chrome `declarativeNetRequest` dynamic filtering alongside real-time MQTT WebSocket interceptors (`edge-chat` & `gateway`).
+- **Hardware-Level Firewall:** Employs Chrome's native `declarativeNetRequest` filtering to block `/seen` telemetry at the network layer.
+- **Fast Native Chat:** Direct messages and chat threads connect directly with zero lag, instant typing, and 100% native WebSocket performance.
 
 ### 📥 Clean Native Media Downloader
 - **Highest 1080p Quality:** Downloads the highest available progressive MP4 video stream or maximum-resolution JPEG image directly from official Instagram CDN endpoints.
@@ -110,7 +110,8 @@ node tests/run-all-tests.js
 ## 🇷🇴 Rezumat în Limba Română
 
 **IG Tools** este o extensie gratuită și open-source pentru Instagram Desktop:
-- **Ghost Mode:** Vezi Story-uri și citești mesaje private fără ca expeditorul să primească confirmare de citire (Seen).
+- **Ghost Mode Stories:** Vezi Story-uri fără ca expeditorul să primească confirmare de vizualizare (Seen).
+- **Chat Rapid & Fără Lag:** Conversațiile și mesajele directe se deschid instantaneu, la viteză 100% nativă.
 - **Descărcare Media 1080p:** Buton curat integrat nativ lângă butonul de Share pentru descărcat Reels, Postări, Carusel și Story-uri la rezoluție maximă.
 - **Friends Who Liked:** Îți arată automat prietenii care au dat like la un Reel, poziționat deasupra numelui autorului (exclusiv pe Reels).
 - **Control Video Complet:** Bară de derulare (scrubbing), control fin al volumului, buton de sunet permanent și viteză 2x.

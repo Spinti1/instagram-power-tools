@@ -731,42 +731,19 @@ window.IGTools.reelSlider = (() => {
       return false;
     }
 
-    // Check ancestors for message thread attributes or message links
-    let parent = video.parentElement;
-    let depth = 0;
-    while (parent && parent !== document.body && depth < 20) {
-      if (
-        parent.getAttribute?.('data-pagelet')?.toLowerCase().includes('direct') ||
-        parent.getAttribute?.('aria-label')?.toLowerCase().includes('direct') ||
-        parent.getAttribute?.('aria-label')?.toLowerCase().includes('chat') ||
-        parent.getAttribute?.('aria-label')?.toLowerCase().includes('mesaj')
-      ) {
-        return false;
-      }
-      if (parent.querySelector && parent.querySelector('a[href*="/direct/t/"], a[href*="/direct/inbox/"]')) {
-        const isPostArticle = parent.closest('article');
-        if (!isPostArticle) return false;
-      }
-      parent = parent.parentElement;
-      depth++;
-    }
-
     const r = video.getBoundingClientRect();
-    if (r.width < 120 || r.height < 120) {
+    if (r.width < 180 || r.height < 180) {
       // Exclude tiny video notes, avatars, or previews
       return false;
     }
 
-    // 3. Check if Reel
+    // 3. Check if Reel URL
     const isReelPath = path.startsWith('/reels') || path.startsWith('/reel') || path.includes('/reel/') || path.includes('/reels/');
-    const isReelsNavActive = Boolean(document.querySelector('a[href*="/reels/"][aria-current="page"], a[href*="/reels/"] svg[aria-label="Reels"]'));
-    const isVerticalReel = r.height >= 350 && r.height > r.width * 1.15;
-    if (isReelPath || isReelsNavActive || isVerticalReel) {
+    if (isReelPath) {
       return true;
     }
 
-    // 4. Check if Post that is a video
-    // Feed post video is inside an <article> tag or on a /p/ URL or inside a post modal
+    // 4. Check if Post video (inside <article> on feed or /p/ page)
     const isPostPath = path.startsWith('/p/') || path.includes('/p/');
     const insideArticle = Boolean(video.closest('article'));
     const insidePostDialog = Boolean(video.closest('div[role="dialog"] article'));
@@ -790,7 +767,15 @@ window.IGTools.reelSlider = (() => {
     const rect = video.getBoundingClientRect();
     const windowH = window.innerHeight;
 
-    if (rect.height < 60 || rect.bottom < 60 || rect.top > windowH - 60) {
+    // Ensure the video is substantially visible in the vertical viewport
+    if (rect.height < 150 || rect.bottom < 150 || rect.top > windowH - 120) {
+      slider.style.display = 'none';
+      return;
+    }
+
+    const bottomOffset = windowH - rect.bottom + 8;
+    // Prevent the slider from flying up into the upper viewport if the video is partially scrolled off
+    if (bottomOffset < 8 || bottomOffset > windowH - 60) {
       slider.style.display = 'none';
       return;
     }
@@ -799,7 +784,7 @@ window.IGTools.reelSlider = (() => {
     slider.style.position = 'fixed';
     slider.style.left = `${Math.round(rect.left + 10)}px`;
     slider.style.width = `${Math.round(rect.width - 20)}px`;
-    slider.style.bottom = `${Math.round(windowH - rect.bottom + 8)}px`;
+    slider.style.bottom = `${Math.round(bottomOffset)}px`;
     slider.style.top = 'auto';
     slider.style.right = 'auto';
     slider.style.zIndex = '2147483647';
@@ -951,19 +936,21 @@ window.IGTools.reelSlider = (() => {
       onReady();
     }
 
-    // Continuous updates for position & active Reel tracking
-    window.addEventListener('scroll', () => {
-      if (activeVideo) updateSliderPosition(activeVideo);
-      checkActiveReel();
-    }, { passive: true });
+    // Throttled 60fps updates for position & active Reel tracking
+    let scrollRaf = null;
+    function onScrollOrResize() {
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(() => {
+        scrollRaf = null;
+        if (activeVideo) updateSliderPosition(activeVideo);
+        checkActiveReel();
+      });
+    }
 
-    window.addEventListener('resize', () => {
-      if (activeVideo) updateSliderPosition(activeVideo);
-      checkActiveReel();
-    }, { passive: true });
-
+    window.addEventListener('scroll', onScrollOrResize, { passive: true });
+    window.addEventListener('resize', onScrollOrResize, { passive: true });
     window.addEventListener('play', checkActiveReel, true);
-    setInterval(checkActiveReel, 400);
+    setInterval(checkActiveReel, 500);
   }
 
   return {

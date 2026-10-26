@@ -475,37 +475,22 @@
             <span class="ig-tools-switch-slider"></span>
           </label>
         </div>
-
-        <div class="ig-tools-row-item">
-          <div class="ig-tools-item-info">
-            <span class="ig-tools-item-title">Ghost Direct Messages</span>
-            <span class="ig-tools-item-desc">Open conversations silently without sending 'Seen' receipt.</span>
-          </div>
-          <label class="ig-tools-switch mini">
-            <input type="checkbox" id="ig-toggle-ghost-dms" ${currentSettings.ghostDMs ? 'checked' : ''} ${!currentSettings.ghostMode ? 'disabled' : ''} />
-            <span class="ig-tools-switch-slider"></span>
-          </label>
-        </div>
       </div>
 
       <!-- Live Blocked Stats -->
       <div class="ig-tools-card">
         <span class="ig-tools-card-header-label">Shield Activity (Session)</span>
-        <div class="ig-tools-stats-grid">
+        <div class="ig-tools-stats-grid" style="grid-template-columns: 1fr;">
           <div class="ig-tools-stat-box">
             <span class="ig-tools-stat-number" id="ig-stat-stories-num">${cachedStats.stories}</span>
             <span class="ig-tools-stat-caption">Stories Kept Secret</span>
-          </div>
-          <div class="ig-tools-stat-box">
-            <span class="ig-tools-stat-number" id="ig-stat-dms-num">${cachedStats.dms}</span>
-            <span class="ig-tools-stat-caption">DM Receipts Blocked</span>
           </div>
         </div>
         <div class="ig-tools-security-note">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           </svg>
-          <span>100% Client-Side Interception • Zero Data Leaks</span>
+          <span>100% Client-Side Interception • Fast Native Chat</span>
         </div>
       </div>
     `;
@@ -518,10 +503,6 @@
 
     container.querySelector('#ig-toggle-ghost-stories')?.addEventListener('change', async (e) => {
       await saveSetting('ghostStories', e.target.checked);
-    });
-
-    container.querySelector('#ig-toggle-ghost-dms')?.addEventListener('change', async (e) => {
-      await saveSetting('ghostDMs', e.target.checked);
     });
   }
 

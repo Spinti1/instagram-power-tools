@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     storiesToggle.disabled = !ghostMode;
-    dmsToggle.disabled = !ghostMode;
+    if (dmsToggle) dmsToggle.disabled = !ghostMode;
   }
 
   function formatTimestamp(isoString) {
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     masterToggle.checked = ghostMode;
     storiesToggle.checked = ghostStories;
-    dmsToggle.checked = ghostDMs;
+    if (dmsToggle) dmsToggle.checked = ghostDMs;
     widgetToggle.checked = showWidget;
     downloaderToggle.checked = downloader;
     friendsToggle.checked = friends;
@@ -75,11 +75,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     renderState(ghostMode);
 
-    const stats = data.stats || { storiesBlocked: 0, dmsBlocked: 0, mediaDownloaded: 0, lastBlockedTime: null };
-    statStories.textContent = stats.storiesBlocked || 0;
-    statDMs.textContent = stats.dmsBlocked || 0;
-    statDownloads.textContent = stats.mediaDownloaded || 0;
-    statLastTime.textContent = formatTimestamp(stats.lastBlockedTime);
+    const stats = data.stats || { storiesBlocked: 0, mediaDownloaded: 0, lastBlockedTime: null };
+    if (statStories) statStories.textContent = stats.storiesBlocked || 0;
+    if (statDMs) statDMs.textContent = stats.dmsBlocked || 0;
+    if (statDownloads) statDownloads.textContent = stats.mediaDownloaded || 0;
+    if (statLastTime) statLastTime.textContent = formatTimestamp(stats.lastBlockedTime);
   }
 
   // Master Ghost Mode toggle
@@ -95,9 +95,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // DMs toggle
-  dmsToggle.addEventListener('change', async (e) => {
-    await chrome.storage.local.set({ ghostDMs: e.target.checked });
-  });
+  if (dmsToggle) {
+    dmsToggle.addEventListener('change', async (e) => {
+      await chrome.storage.local.set({ ghostDMs: e.target.checked });
+    });
+  }
 
   // In-Page Widget toggle
   widgetToggle.addEventListener('change', async (e) => {
